@@ -30,7 +30,15 @@ public class MonsterControl : MonoBehaviour {
 	
 	//공속 
 	public float mAttackSpeed;
-	
+
+	//싱글 타겟이 된 것인지. 확인한다..
+	public bool SingleTargeted;
+
+	//모든 타겟이 된 것인지..
+	public bool AllTargeted;
+
+
+
 	//추후 스킬 구현..스킬 리스트.??
 	
 	//히어로 의 상태 (대기, 달림, 공격, 사망)
@@ -55,14 +63,20 @@ public class MonsterControl : MonoBehaviour {
 	void Start () {
 		
 		//1.HP 넣고, 2. 백그라운드 컴퍼넌트 넣고, 3. 활이 발사될 장소를 넣고. 스타트
-		mHP = mOrinHP;
+		//mHP = mOrinHP;
+		//Debug.Log ("mOrinHP= " + mOrinHP);
+		//Debug.Log ("first mHP = " + mHP);
+		mMP = mOrinMP;
+
 		mAttack = mOrinAttack;
+
+		SingleTargeted = false;
+		AllTargeted = false;
 		
 		//Archer의 Animator 컴포넌트 레퍼런스를 가져옵니다.
 		//이 script가 붙은 gameObject에 Animator를 가져옴.
 		mAnimator = gameObject.GetComponent<Animator> ();
-		
-		
+
 	}
 
 	//상테와 파라메터를 통해 아처의 상태를 컨트롤 합니다.
@@ -105,7 +119,21 @@ public class MonsterControl : MonoBehaviour {
 
 	public void RandomHP()
 	{
+		//1.HP 넣고, 2. 백그라운드 컴퍼넌트 넣고, 3. 활이 발사될 장소를 넣고. 스타트
+		mHP = mOrinHP;
+		Debug.Log ("mOrinHP= " + mOrinHP);
+
 		mHP += Random.Range(-10, 10);    
+
+		Debug.Log ("hp is = "+ mHP);
+	}
+
+	public void SetSingleTarget(){
+		SingleTargeted = true;
+	}
+
+	public void SetAllTarget(){
+		AllTargeted = true;
 	}
 
 
@@ -114,9 +142,9 @@ public class MonsterControl : MonoBehaviour {
 		Debug.Log ("monster hitted");
 		
 		GameObject Hero = GameObject.Find ("Hero");
-		HeroControl archercontrol = Hero.GetComponent<HeroControl> ();
+		HeroControl mHeroControl = Hero.GetComponent<HeroControl> ();
 		
-		//mHP -= archercontrol.GetRandomDamage ();
+		//mHP -= mHeroControl.GetRandomDamage ();
 		mAnimator.SetTrigger ("Damage");
 		
 		

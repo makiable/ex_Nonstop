@@ -1,8 +1,10 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scrpts\In_GameManager.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scrpts\MonsterControl.cs">
     <Files>
-      <File FileName="Assets\Scrpts\In_GameManager.cs" Line="55" Column="22" />
+      <File FileName="Assets\Scrpts\MonsterControl.cs" Line="135" Column="29" />
+      <File FileName="Assets\Scrpts\In_GameManager.cs" Line="136" Column="25" />
+      <File FileName="Assets\Scrpts\HeroControl.cs" Line="106" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

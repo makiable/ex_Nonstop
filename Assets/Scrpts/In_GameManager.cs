@@ -113,13 +113,19 @@ public class In_GameManager : MonoBehaviour {
 
 	private void SpawnMonster(int idx)
 	{
+		Debug.Log ("몬스터 출현 시작");
 		// Resources 폴더로부터 Monster 프리팹(Prefab)을 로드합니다.
 		Object prefab = Resources.Load("Monster01");
-		
+
+		Debug.Log ("리소스 로드 완료");
+
 		// 참조한 프리팹을 인스턴스화 합니다. (화면에 나타납니다.)
 		GameObject monster = Instantiate(prefab, mSpwanPoint[idx].position, Quaternion.identity) as GameObject;
+
+		//위치 값이 이상해서, 수동으로 조절 했음.
 		monster.transform.parent = mSpwanPoint[idx];
-		
+
+
 		Debug.Log ("idx="+idx);
 		
 		
@@ -132,9 +138,14 @@ public class In_GameManager : MonoBehaviour {
 		
 		mMonster01[idx].idx = idx;
 		mMonster01[idx].RandomHP();//
-		monster.name = "Monster"+idx;
+
+		Debug.Log ("monster Hp = " + mMonster01[idx].mHP);
+		monster.name = "Monster01"+idx;
 		// 레이어 오더를 단계적으로 주어 몬스터들의 뎁스가 차례대로 겹치도록 한다.
 		monster.GetComponent<SpriteRenderer>().sortingOrder = idx+1;
+
+		Debug.Log ("완료");
+
 	}
 
 
