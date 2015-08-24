@@ -19,7 +19,7 @@ public class In_GameManager : MonoBehaviour {
 
 	//오토 타겟 몬스터 참조.
 	[HideInInspector]
-	public MonsterControl targetMonster;
+	public MonsterControl TargetMonster;
 
 	private int monsterSpwanNumber = 3;
 
@@ -75,8 +75,6 @@ public class In_GameManager : MonoBehaviour {
 
 				//스타트 TEXT 출현..
 				mIngTextMassage.text = "스타트!";
-				//mTextMesh.text = LiveDays.LiveDaysint.ToString ();
-				Debug.Log("스타트");
 
 				yield return new WaitForSeconds (1.2f);
 
@@ -97,13 +95,13 @@ public class In_GameManager : MonoBehaviour {
 
 				yield return new WaitForSeconds(2); // 2초 대기..
 
-				mIngTextMassage.text="Battle Start";
+				mIngTextMassage.text="*배틀 스타트*";
 
 				//배틀 상태로 둔다..
 				mStageStatus = StageStatus.Battle;
 
 				//코루틴 실행.
-				//StartCoroutine("HeroAutoAttack");
+				StartCoroutine("HeroAutoAttack");
 				//StartCoroutine("MonsterAutoAttack");
 				yield break;
 			}
@@ -148,6 +146,41 @@ public class In_GameManager : MonoBehaviour {
 
 	}
 
+	IEnumerator HeroAutoAttack(){
+
+		GetSingleAutoTarget ();
+
+		while (mStageStatus == StageStatus.Battle) {
+			//공격 애니메이션 추가.
+			mHero01.SetStatus(HeroControl.Status.Attack);
+			//한번 공격하고 공격 속도 만큼 멈춘다.
+			yield return new WaitForSeconds(mHero01.mAttackSpeed);
+
+		}
+	}
+
+	//IEnumerator HeroAutoAttack01(){
+
+	//	GetSingleAutoTarget ();
+
+	//	while (mStageStatus == StageStatus.Battle) {
+	//		Invoke("heroMontionAttack", 2f);
+	//	}
+	//}
+	//void heroMontionAttack(){
+	//	mHero01.SetStatus (HeroControl.Status.Attack);
+	//}
+
+
+	private void GetSingleAutoTarget(){
+
+		//포지션에서 맨 앞에 있는 애를 잡도록 나중에 수정이 필요함.. 지금은 HP분으로 체크..
+		TargetMonster = mMonster01.Where(m=>m.mHP > 0).OrderBy(m=>m.mHP).First();
+
+		TargetMonster.SetSingleTarget ();
+
+
+	}
 
 
 

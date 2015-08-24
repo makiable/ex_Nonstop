@@ -28,6 +28,10 @@ public class HeroControl : MonoBehaviour {
 	//공속 
 	public float mAttackSpeed;
 
+	//스킬 쿨타임.
+	public float mSkillSpeed;
+
+
 	//추후 스킬 구현..스킬 리스트.??
 
 	//히어로 의 상태 (대기, 달림, 공격, 사망)
