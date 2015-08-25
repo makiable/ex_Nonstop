@@ -21,9 +21,9 @@ public class HeroControl : MonoBehaviour {
 	public int mMP;
 
 	//공격 데미지 (현제는 걍 데미지만.. 나중에 공격력이랑 수정 필요)
-	public int mOrinAttack;
+	public int mOrinAttackPower;
 	[HideInInspector]
-	public int mAttack;
+	public int mAttackPower;
 
 	//공속 
 	public float mAttackSpeed;
@@ -31,7 +31,11 @@ public class HeroControl : MonoBehaviour {
 	//스킬 쿨타임.
 	public float mSkillSpeed;
 
+	//히어로의 터겟 넘버.
+	public int mHeroTargetNumber;
 
+	public bool mHeroSingleTargeted;
+	
 	//추후 스킬 구현..스킬 리스트.??
 
 	//히어로 의 상태 (대기, 달림, 공격, 사망)
@@ -57,7 +61,11 @@ public class HeroControl : MonoBehaviour {
 
 		//1.HP 넣고, 2. 백그라운드 컴퍼넌트 넣고, 3. 활이 발사될 장소를 넣고. 스타트
 		mHP = mOrinHP;
-		mAttack = mOrinAttack;
+		mAttackPower = mOrinAttackPower;
+
+		mHeroTargetNumber = 1;
+		mHeroSingleTargeted = true;
+
 		
 		//Archer의 Animator 컴포넌트 레퍼런스를 가져옵니다.
 		//이 script가 붙은 gameObject에 Animator를 가져옴.
@@ -103,8 +111,28 @@ public class HeroControl : MonoBehaviour {
 	
 	}
 
+	public int GetRandomDamage(){
+		return mAttackPower + Random.Range(-10, 10);
+	}
 
+	//데미지 처리..
+	public void heroAttackedMonsterNormal(int damage){
 
+		mHP -= damage;
+
+		if (mHP > 0) {
+			mAnimator.SetTrigger("Damaged");
+		}
+
+		if (mHP <= 0) {
+			mAnimator.SetTrigger("Dead");
+			mStatus = Status.Dead;
+			mHP = 0;
+			mHeroSingleTargeted = false;
+			mIn_GameManager.GameOver();
+
+		}
+	}
 }
 
 

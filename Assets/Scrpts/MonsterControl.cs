@@ -3,11 +3,11 @@ using System.Collections;
 
 public class MonsterControl : MonoBehaviour {
 
-	//게임메니저에서 몬스터를 컨트롤 한다.
-	public In_GameManager mIn_GameManager;
+	//프라이빗 게임메니저에서 몬스터를 컨트롤 한다.
+	private In_GameManager mIn_GameManager;
 	
 	//mAnimator를 선언.
-	private Animator mAnimator;
+	public Animator mAnimator;
 
 	//몬스터 숫자.
 	public int idx;
@@ -37,7 +37,11 @@ public class MonsterControl : MonoBehaviour {
 	//모든 타겟이 된 것인지..
 	public bool AllTargeted;
 
+	[HideInInspector]
+	public int TargetNumber;
 
+	[HideInInspector]
+	public int saveDamageTextForShow;
 
 	//추후 스킬 구현..스킬 리스트.??
 	
@@ -61,13 +65,12 @@ public class MonsterControl : MonoBehaviour {
 	
 	// Use this for initialization
 	void Start () {
-		
-		//1.HP 넣고, 2. 백그라운드 컴퍼넌트 넣고, 3. 활이 발사될 장소를 넣고. 스타트
-		//mHP = mOrinHP;
-		//Debug.Log ("mOrinHP= " + mOrinHP);
-		//Debug.Log ("first mHP = " + mHP);
-		mMP = mOrinMP;
 
+
+		// 참조해야할 객체나 스크립트들을 여기서 설정하게 될 것입니다.
+		mIn_GameManager = In_GameManager.FindObjectOfType<In_GameManager>();
+
+		mMP = mOrinMP;
 		mAttack = mOrinAttack;
 
 		SingleTargeted = false;
@@ -143,20 +146,30 @@ public class MonsterControl : MonoBehaviour {
 		
 		GameObject Hero = GameObject.Find ("Hero");
 		HeroControl mHeroControl = Hero.GetComponent<HeroControl> ();
-		
-		//mHP -= mHeroControl.GetRandomDamage ();
-		mAnimator.SetTrigger ("Damage");
-		
+
+
+		saveDamageTextForShow = mHeroControl.GetRandomDamage ();
+		mIn_GameManager.mIngTextMassage.text = "적에게 데미지:" + saveDamageTextForShow + "를 주었다.";
+
+		mHP -= saveDamageTextForShow;
+
+
+		mAnimator.SetTrigger ("Damaged");
+
+		Debug.Log ("last hp ="+mHP);
 		
 		// 사망처리
 		if(mHP <= 0)
 		{
 			mStatus = Status.Dead;
 			mHP = 0;
-			//mCollider.enabled = false;
+			mIn_GameManager.mIngTextMassage.text = "적을 물리쳤다.";
+			SingleTargeted = false;
+			AllTargeted = false;
 			mAnimator.SetTrigger("Dead");
-			//mGameManager.ReAutoTarget();
-			Destroy(gameObject, 1f);
+			TargetNumber = -1; //더이상 타겟이 아님요...
+			mIn_GameManager.ReAutoTarget();
+			Destroy(gameObject, 1);
 		}
 	}
 
