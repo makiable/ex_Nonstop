@@ -17,9 +17,11 @@ public class In_GameManager : MonoBehaviour {
 	public TextMesh mIngTextMassage;
 	
 
-	//오토 타겟 몬스터 참조.
+	//오토 타겟 몬스터 참조. 1명을 잡을때
 	[HideInInspector]
 	public MonsterControl TargetMonster;
+
+	public MonsterControl[] AllTargetMonster;
 
 	private int monsterSpwanNumber = 3;
 
@@ -99,6 +101,7 @@ public class In_GameManager : MonoBehaviour {
 
 				//코루틴 실행.
 				StartCoroutine("HeroAutoAttack");
+				StartCoroutine("HeroSkillAttack");
 				StartCoroutine("MonsterAutoAttack");
 				yield break;
 			}
@@ -116,9 +119,6 @@ public class In_GameManager : MonoBehaviour {
 
 		//위치 값이 이상해서, 수동으로 조절 했음.
 		monster.transform.parent = mSpwanPoint[idx];
-
-
-		Debug.Log ("idx="+idx);
 		
 		
 		// 생성된 인스턴스에서 MonsterControl 컴포넌트를 불러내어 mMonster 리스트에 Add 시킵니다.
@@ -130,14 +130,13 @@ public class In_GameManager : MonoBehaviour {
 		
 		mMonster01[idx].idx = idx;
 		mMonster01[idx].RandomHP();//
-		mMonster01 [idx].TargetNumber = idx+1;
+		mMonster01 [idx].monsterHPtext.text = mMonster01 [idx].mHP.ToString ();
 
-		Debug.Log ("monster Hp = " + mMonster01[idx].mHP);
+		mMonster01 [idx].TargetNumber = idx+1;
 		monster.name = "Monster01"+idx;
 		// 레이어 오더를 단계적으로 주어 몬스터들의 뎁스가 차례대로 겹치도록 한다.
 		monster.GetComponent<SpriteRenderer>().sortingOrder = idx+1;
 
-		Debug.Log ("완료");
 
 	}
 
@@ -159,21 +158,55 @@ public class In_GameManager : MonoBehaviour {
 			yield return new WaitForSeconds(mHero01.mAttackSpeed);
 		}
 	}
+
+	IEnumerator HeroSkillAttack(){
+		GetAllAutoTarget ();
+		while (mStageStatus == StageStatus.Battle) {
+			yield return new WaitForSeconds(mHero01.mSkillSpeed);
+			mHero01.SetStatus(HeroControl.Status.UseSkill);
+
+			if (mMonster01[0] != null) {
+				mMonster01[0].Damaged();
+				Debug.Log("몬스터 0에게 데미지 ="+mMonster01[0].saveDamageTextForShow);
+			}
+
+			if (mMonster01[1] != null) {
+				mMonster01[1].Damaged();
+				Debug.Log("몬스터 1에게 데미지 ="+mMonster01[1].saveDamageTextForShow);
+			}
+
+			if (mMonster01[2] != null) {
+				mMonster01[2].Damaged();
+				Debug.Log("몬스터 1에게 데미지 ="+mMonster01[2].saveDamageTextForShow);
+			}
+
+			//이걸 쓰면 몬스터에게 광역이 안들어감 하나를 못찾음..
+			//for (int i = 0; i < mMonsterCount; i++) {
+			//	if (mMonster01[i] != null) {
+			//		mMonster01[i].Damaged();
+			//		Debug.Log("몬스터 "+i+"에게 "+mMonster01[i].saveDamageTextForShow+"를 주었다. 남은 HP = "+mMonster01[i].mHP);
+			//	}
+			//Debug.Log("몬스터0 hp= "+mMonster01[0].mHP+"..몬스터 1 hp = "+mMonster01[1].mHP+"..몬스터 2 hp ="+mMonster01[2].mHP);
+			//mMonster01.Damaged();
+		}
+	}
+
+	private void GetAllAutoTarget(){
+	//	TargetMonster.SetAllTarget ();
+	}
 	
 	
 	private void GetSingleAutoTarget(){
-		Debug.Log ("GetSingleAutoTarget()");
-
-
 		//1. HP로 소팅할 경우 이거 참조..
 		//TargetMonster = mMonster01.Where(m=>m.mHP > 0).OrderBy(m=>m.mHP).First();
 		//2. 타겟 넘버를 지정 맨 앞에 를 타겟으로 잡는다.
 		TargetMonster = mMonster01.Where (m => m.TargetNumber > 0).OrderBy (m => m.TargetNumber).First ();
-		
 		TargetMonster.SetSingleTarget ();
 	}
+
 	public void ReAutoTarget(){
 		mMonsterCount -= 1;
+		Debug.Log ("몬스터 카운트= "+mMonsterCount);
 
 		TargetMonster = null;
 
@@ -182,17 +215,14 @@ public class In_GameManager : MonoBehaviour {
 			mLoopCount -= 1;
 
 			StopCoroutine ("HeroAutoAttack");
+			StopCoroutine ("HeroSkillAttack");
 
 			//mIngTextMassage.text = "모든 적을 격파";
 
 			if (mLoopCount == 0) {
 				//모든 스테이지 클리어. -> 승리 결과창.
 
-				Debug.Log ("in 루프 카운트..");
-
 				mIngTextMassage.text = "스테이지 클리어!";
-
-				Debug.Log ("게임오버로 넘기기 직전..");
 
 				//Invoke ("GameOver", 2);
 				GameOver();
@@ -205,7 +235,6 @@ public class In_GameManager : MonoBehaviour {
 		}
 		//타겟 재 탐색.
 		GetSingleAutoTarget();
-		Debug.Log ("GetSingleAutoTarget()");
 	}
 
 	// 몬스터 자동 공격 입니다잉~~~
@@ -221,7 +250,6 @@ public class In_GameManager : MonoBehaviour {
 				monster.mAnimator.SetTrigger("Attack");
 
 				mHero01.heroAttackedMonsterNormal(monster.mAttack);
-				Debug.Log("monster shoot");
 
 				yield return new WaitForSeconds(monster.mAttackSpeed + Random.Range(0, 0.5f));
 			}
@@ -231,7 +259,6 @@ public class In_GameManager : MonoBehaviour {
 	
 
 	private void GetMonsterSingleAutoTarget(){
-		Debug.Log ("GetMonsterSearchTarget()");
 
 		//지금은 한명이니, 1인에가 타겟임..
 		mHero01.mHeroSingleTargeted = true;
@@ -249,34 +276,29 @@ public class In_GameManager : MonoBehaviour {
 		//캐릭터 상태 동작.
 		if (trigger == "ChangeStatus") {
 			mHero01.SetStatus(HeroControl.Status.Attack);
-			Debug.Log("Status Change good");
 
 			//mMonster01.SetStatus(MonsterControl.Status.Damaged);
 		}
 
 		if (trigger == "StopStatus") {
 			mHero01.SetStatus(HeroControl.Status.Idle);
-			Debug.Log("idle ok");
 
 			//mMonster01.SetStatus(MonsterControl.Status.UseSkill);
 
 		}
 		if (trigger == "UseSkill") {
 			mHero01.SetStatus(HeroControl.Status.UseSkill);
-			Debug.Log("UseSkill Change good");
 
 			//mMonster01.SetStatus(MonsterControl.Status.Dead);
 		}
 		
 		if (trigger == "Damaged") {
 			mHero01.SetStatus(HeroControl.Status.Damaged);
-			Debug.Log("Damaged ok");
 
 			//mMonster01.SetStatus(MonsterControl.Status.Attack);
 		}
 		if (trigger == "Dead") {
 			mHero01.SetStatus(HeroControl.Status.Dead);
-			Debug.Log("Dead ok");
 
 			//mMonster01.SetStatus(MonsterControl.Status.Idle);
 
@@ -291,9 +313,10 @@ public class In_GameManager : MonoBehaviour {
 	public void GameOver(){
 		//임시
 		Debug.Log("GameOver");    
-		StopCoroutine("HeroAutoAttack");
-		StopCoroutine("MonsterAutoAttack");
-		StopCoroutine("AutoStep");
+		StopCoroutine ("HeroAutoAttack");
+		StopCoroutine ("HeroSkillAttack");
+		StopCoroutine ("MonsterAutoAttack");
+		StopCoroutine ("AutoStep");
 		//Application.LoadLevel("Menu_Default_Scene");
 
 	}

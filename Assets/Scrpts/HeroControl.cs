@@ -35,6 +35,8 @@ public class HeroControl : MonoBehaviour {
 	public int mHeroTargetNumber;
 
 	public bool mHeroSingleTargeted;
+
+	public TextMesh hptext;
 	
 	//추후 스킬 구현..스킬 리스트.??
 
@@ -62,6 +64,8 @@ public class HeroControl : MonoBehaviour {
 		//1.HP 넣고, 2. 백그라운드 컴퍼넌트 넣고, 3. 활이 발사될 장소를 넣고. 스타트
 		mHP = mOrinHP;
 		mAttackPower = mOrinAttackPower;
+
+		hptext.text = mHP.ToString ();
 
 		mHeroTargetNumber = 1;
 		mHeroSingleTargeted = true;
@@ -120,6 +124,10 @@ public class HeroControl : MonoBehaviour {
 
 		mHP -= damage;
 
+		hptext.text = mHP.ToString ();
+
+
+
 		if (mHP > 0) {
 			mAnimator.SetTrigger("Damaged");
 		}
@@ -128,6 +136,7 @@ public class HeroControl : MonoBehaviour {
 			mAnimator.SetTrigger("Dead");
 			mStatus = Status.Dead;
 			mHP = 0;
+			hptext.text = "Dead";
 			mHeroSingleTargeted = false;
 			mIn_GameManager.GameOver();
 

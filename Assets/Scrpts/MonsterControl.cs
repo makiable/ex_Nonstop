@@ -17,6 +17,8 @@ public class MonsterControl : MonoBehaviour {
 	public int mOrinHP;
 	[HideInInspector]
 	public int mHP;
+
+	public TextMesh monsterHPtext;
 	
 	//MANA
 	public int mOrinMP;
@@ -147,12 +149,12 @@ public class MonsterControl : MonoBehaviour {
 		GameObject Hero = GameObject.Find ("Hero");
 		HeroControl mHeroControl = Hero.GetComponent<HeroControl> ();
 
-
 		saveDamageTextForShow = mHeroControl.GetRandomDamage ();
 		mIn_GameManager.mIngTextMassage.text = "적에게 데미지:" + saveDamageTextForShow + "를 주었다.";
 
 		mHP -= saveDamageTextForShow;
 
+		monsterHPtext.text = mHP.ToString ();
 
 		mAnimator.SetTrigger ("Damaged");
 
@@ -168,6 +170,7 @@ public class MonsterControl : MonoBehaviour {
 			AllTargeted = false;
 			mAnimator.SetTrigger("Dead");
 			TargetNumber = -1; //더이상 타겟이 아님요...
+			Debug.Log("Dead");
 			mIn_GameManager.ReAutoTarget();
 			Destroy(gameObject, 1);
 		}
